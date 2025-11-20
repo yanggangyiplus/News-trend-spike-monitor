@@ -1,0 +1,41 @@
+# 이상치 감지 설정
+anomaly:
+  # Z-score 설정
+  zscore:
+    threshold: 2.0  # 표준 편차 배수
+  
+  # Moving Average 설정
+  moving_average:
+    threshold: 2.0
+    window_size: 5
+  
+  # ESD (Extreme Studentized Deviate) 설정
+  esd:
+    threshold: 2.0
+    max_outliers: 10
+
+# 스파이크 감지 설정
+spike:
+  # 감지 방법 선택
+  method: "twitter"  # "twitter", "percentile", "derivative"
+  
+  # Twitter Anomaly Detection Algorithm 설정
+  twitter:
+    threshold: 2.0
+    max_anomalies: 10
+  
+  # Percentile 설정
+  percentile:
+    upper_percentile: 95
+    lower_percentile: 5
+  
+  # Derivative 설정
+  derivative:
+    threshold: 2.0
+    window_size: 3
+
+# 시계열 분석 설정
+time_series:
+  time_window_hours: 24
+  aggregation: "mean"  # "mean", "median", "sum"
+  min_data_points: 3

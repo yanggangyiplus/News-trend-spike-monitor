@@ -1,0 +1,33 @@
+# 데이터 수집 설정
+collector:
+  # RSS 피드 URL 리스트
+  rss_urls:
+    - "https://rss.cnn.com/rss/edition.rss"
+    - "https://feeds.bbci.co.uk/news/rss.xml"
+    - "https://www.yonhapnews.co.kr/bulletin/rss.xml"
+    - "https://www.hani.co.kr/rss/"
+    - "https://rss.joins.com/joins_news_list.xml"
+  
+  # Google News API 설정 (NewsAPI.org)
+  google_news:
+    enabled: true
+    api_key: ""  # NewsAPI 키 입력
+    base_url: "https://newsapi.org/v2/everything"
+    language: "ko"
+    sort_by: "publishedAt"
+  
+  # 수집 설정
+  max_results: 100
+  timeout: 10
+  retry_count: 3
+  retry_delay: 1
+
+# 전처리 설정
+preprocessing:
+  remove_html: true
+  remove_urls: true
+  remove_emoji: true
+  normalize_whitespace: true
+  remove_stopwords: false
+  min_text_length: 10
+  deduplicate: true

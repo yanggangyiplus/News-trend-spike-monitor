@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-trend-web
+  labels:
+    app: news-trend-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: news-trend-web
+  template:
+    metadata:
+      labels:
+        app: news-trend-web
+    spec:
+      containers:
+      - name: web
+        image: news-trend-monitor-web:latest
+        ports:
+        - containerPort: 8501
+        env:
+        - name: API_URL
+          value: "http://news-trend-api:8000"
+        - name: PYTHONPATH
+          value: "/app"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+          initialDelaySeconds: 10
+          periodSeconds: 5
+

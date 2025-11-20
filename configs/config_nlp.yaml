@@ -1,0 +1,25 @@
+# NLP 감정 분석 설정
+nlp:
+  # 모델 설정
+  model_name: "beomi/KcELECTRA-base"
+  # 다른 옵션:
+  # - "beomi/KcELECTRA-base" (한국어 최적화)
+  # - "bert-base-multilingual-cased" (다국어 지원)
+  
+  # 디바이스 설정
+  device: "auto"  # "cuda", "cpu", "mps", "auto"
+  
+  # 배치 처리 설정
+  batch_size: 32
+  max_length: 512
+  
+  # 감정 분석 설정
+  sentiment:
+    labels: ["positive", "negative", "neutral"]
+    threshold: 0.5
+  
+  # 키워드 추출 설정
+  keyword_extraction:
+    enabled: true
+    top_k: 5
+    min_freq: 2

@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # Redis 캐시 서비스
+  redis:
+    image: redis:7-alpine
+    container_name: news-trend-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - news-trend-network
+
+  # FastAPI 백엔드 서비스
+  api:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.api
+    container_name: news-trend-api
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PYTHONPATH=/app
+    volumes:
+      - ../../data:/app/data
+      - ../../logs:/app/logs
+      - ../../configs:/app/configs
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - news-trend-network
+    restart: unless-stopped
+
+  # Streamlit 웹 대시보드 서비스
+  web:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.web
+    container_name: news-trend-web
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+      - PYTHONPATH=/app
+    volumes:
+      - ../../data:/app/data
+      - ../../logs:/app/logs
+      - ../../configs:/app/configs
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - news-trend-network
+    restart: unless-stopped
+
+  # 스케줄러 서비스
+  scheduler:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile.scheduler
+    container_name: news-trend-scheduler
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PYTHONPATH=/app
+    volumes:
+      - ../../data:/app/data
+      - ../../logs:/app/logs
+      - ../../configs:/app/configs
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - news-trend-network
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+
+networks:
+  news-trend-network:
+    driver: bridge
+

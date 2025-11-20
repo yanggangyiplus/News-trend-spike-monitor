@@ -1,0 +1,49 @@
+# 스케줄러용 Dockerfile
+# Multi-stage build로 최적화
+
+# Stage 1: Base image
+FROM python:3.11-slim as base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /app
+
+# Stage 2: Dependencies
+FROM base as dependencies
+
+# 시스템 패키지 설치
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libgomp1 \
+    cron \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 의존성 파일 복사
+COPY requirements.txt .
+
+# PyTorch CPU 버전 설치
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# 나머지 의존성 설치
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 3: Production
+FROM dependencies as production
+
+# 애플리케이션 코드 복사
+COPY src/ ./src/
+COPY scripts/scheduler.py ./scripts/
+COPY configs/ ./configs/
+COPY deployment/docker/entrypoint.sh ./entrypoint.sh
+
+# 엔트리포인트 실행 권한 부여
+RUN chmod +x ./entrypoint.sh
+
+# 엔트리포인트 실행
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["python", "scripts/scheduler.py", "--keywords", "AI", "Technology", "--interval", "60", "--mode", "async"]
+

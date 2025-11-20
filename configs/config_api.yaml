@@ -1,0 +1,51 @@
+# FastAPI 서버 설정
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  log_level: "info"
+  workers: 1
+
+# 데이터 수집 설정
+collector:
+  rss_urls:
+    - "https://rss.cnn.com/rss/edition.rss"
+    - "https://feeds.bbci.co.uk/news/rss.xml"
+    - "https://www.yonhapnews.co.kr/bulletin/rss.xml"
+  google_news:
+    enabled: true
+    api_key: ""  # NewsAPI 키 입력 (선택사항)
+    base_url: "https://newsapi.org/v2/everything"
+    language: "ko"
+    sort_by: "publishedAt"
+  max_results: 100
+  timeout: 10
+  retry_count: 3
+  retry_delay: 1
+
+# NLP 설정
+nlp:
+  model_name: "beomi/KcELECTRA-base"  # 또는 "bert-base-multilingual-cased"
+  device: "auto"  # "cuda", "cpu", "mps", "auto"
+  batch_size: 32
+  max_length: 512
+
+# 이상치 감지 설정
+anomaly:
+  zscore:
+    threshold: 2.0
+  moving_average:
+    window_size: 5
+    threshold: 2.0
+
+# 스파이크 감지 설정
+spike:
+  method: "twitter"  # "twitter", "percentile", "derivative"
+  threshold: 2.0
+  max_anomalies: 10
+
+# 로깅 설정
+logging:
+  level: "INFO"
+  file: "logs/app.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

@@ -1,0 +1,19 @@
+{
+  "entries": [
+    {
+      "title": "AI Technology Breakthrough",
+      "link": "https://example.com/news/1",
+      "published": "2024-01-15 10:00:00",
+      "summary": "Scientists have made a major breakthrough in AI technology.",
+      "source": "Test News"
+    },
+    {
+      "title": "Tech Industry Updates",
+      "link": "https://example.com/news/2",
+      "published": "2024-01-15 11:00:00",
+      "summary": "Latest updates from the technology industry.",
+      "source": "Test News"
+    }
+  ]
+}
+

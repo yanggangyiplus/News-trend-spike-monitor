@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: news-trend-api
+  labels:
+    app: news-trend-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: news-trend-api
+  template:
+    metadata:
+      labels:
+        app: news-trend-api
+    spec:
+      containers:
+      - name: api
+        image: news-trend-monitor-api:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: REDIS_HOST
+          value: "news-trend-redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: PYTHONPATH
+          value: "/app"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
